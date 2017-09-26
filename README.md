@@ -1,6 +1,6 @@
 # Hangman
 
-**TODO: Add description**
+**Hangman Game**
 
 ## Installation
 
