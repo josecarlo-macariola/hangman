@@ -17,20 +17,22 @@ defmodule Hangman.Game do
     new_game(Dictionary.random_word)    
   end
  
-  def make_move(game = %{game_state: state}, guess) when state in [:won , :lost] do
-    game
+  def make_move(game = %{game_state: state}, _guess) when state in [:won , :lost] do
+    game |>
+    return_with_tally()
   end
   
   def make_move(game, guess) do
     accept_move(game, guess , MapSet.member?(game.used, guess))
+    |> return_with_tally()
   end
-
+ 
   def tally(game) do
     %{
       game_state: game.game_state,
       turns_left: game.turns_left,
       letters:    game.letters |> reveal_guessed(game.used),
-      word: Enum.join(game.letters)
+    #  word: Enum.join(game.letters)
     }
   end
 
@@ -38,8 +40,8 @@ defmodule Hangman.Game do
   # PRIVATE
   ############
   
-  defp accept_move(game, guess, _already_guessed = true) do
-    game = Map.put(game, :game_state, :already_used)
+  defp accept_move(game, _guess, _already_guessed = true) do
+    Map.put(game, :game_state, :already_used)
   end
   
   defp accept_move(game, guess , _already_guessed) do
@@ -71,9 +73,11 @@ defmodule Hangman.Game do
   end
 
   defp reveal_letter(letter, _in_word = true), do: letter
-  defp reveal_letter(letter, _not_in_word),    do: "_"
+  defp reveal_letter(_letter, _not_in_word),    do: "_"
  
   defp maybe_won(true), do: :won
   defp maybe_won(_), do: :good_guess
 
+  defp return_with_tally(game), do: { game, tally(game) }
+  
 end
